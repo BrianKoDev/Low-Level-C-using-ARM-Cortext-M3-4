@@ -1,3 +1,0 @@
-Dependencies for Project 'task2v1', Target 'Target 1': (DO NOT MODIFY !)
-CompilerVersion: 5060750::V5.06 update 6 (build 750)::ARMCC
-F (.\task2v1.s)(0x5E852191)(--cpu Cortex-M3 --li --pd "__EVAL SETA 1" -g --apcs=interwork -I.\RTE\_Target_1-IC:\Users\kbria\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\Device\ARM\ARMCM3\Include-IC:\Keil_v5\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 529" --pd "ARMCM3 SETA 1"--list .\listings\task2v1.lst --xref -o .\objects\task2v1.o --depend .\objects\task2v1.d)

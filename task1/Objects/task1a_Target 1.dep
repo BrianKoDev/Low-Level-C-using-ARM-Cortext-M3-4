@@ -1,0 +1,3 @@
+Dependencies for Project 'task1a', Target 'Target 1': (DO NOT MODIFY !)
+CompilerVersion: 5060750::V5.06 update 6 (build 750)::ARMCC
+F (.\task1a.s)(0x5E835F34)(--cpu Cortex-M4.fp.sp --li --pd "__EVAL SETA 1" -g --apcs=interwork -I.\RTE\_Target_1-IC:\Users\kbria\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\Device\ARM\ARMCM4\Include-IC:\Keil_v5\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 529" --pd "ARMCM4_FP SETA 1"--list .\listings\task1a.lst --xref -o .\objects\task1a.o --depend .\objects\task1a.d)

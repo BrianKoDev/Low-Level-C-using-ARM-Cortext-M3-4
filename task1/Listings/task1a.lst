@@ -1,0 +1,151 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; Task 1 - Trigonometric approximations Cortex-M4
+    2 00000000         ; This program estimates the value of sin(x)
+    3 00000000         ; using the first 3 terms of the Taylor series
+    4 00000000         ; result is stored in register s10
+    5 00000000         
+    6 00000000                 THUMB
+    7 00000000                 AREA             RESET, CODE, READONLY
+    8 00000000                 EXPORT           __Vectors
+    9 00000000                 EXPORT           Reset_Handler
+   10 00000000         __Vectors
+   11 00000000 20001000        DCD              0x20001000  ; top of the stack 
+                                                            
+   12 00000004 00000000        DCD              Reset_Handler ; reset vector - 
+                                                            where the program s
+                                                            tarts
+   13 00000008         
+   14 00000008                 AREA             Task1a_Code, CODE, READONLY
+   15 00000000                 ENTRY
+   16 00000000         Reset_Handler
+   17 00000000         copro_setup
+   18 00000000 F8DF 004C       LDR.W            r0, = 0xE000ED88 ; address of c
+                                                            o-processor registe
+                                                            r
+   19 00000004 6801            LDR              r1, [r0]    ; Read CPACR - the 
+                                                            co-processor regist
+                                                            er
+   20 00000006 F441 0170       ORR              r1, r1, #(0xF << 20) ; bits 20-
+                                                            23 to enable CP10 a
+                                                            nd CP11 coprocessor
+                                                            s
+   21 0000000A 6001            STR              r1, [r0]    ; write back update
+                                                            d value to CPACR
+   22 0000000C F3BF 8F4F       DSB                          ; wait for transfer
+                                                             to complete
+   23 00000010         
+   24 00000010 4A10            LDR              r2,=0x40490fd0 ;store value of 
+                                                            pi in literal pool
+   25 00000012 EE00 2A10       VMOV.F           s0,r2       ;store value of pi 
+                                                            in s0
+   26 00000016         
+   27 00000016         
+   28 00000016 EEB0 1A00       VMOV.F           s2,#2       ;store value of 2
+   29 0000001A EEC0 0A01       VDIV.F           s1,s0,s2    ; store pi/2 in s1
+   30 0000001E         
+   31 0000001E         ;Find second term
+   32 0000001E EE20 1AA0       VMUL.F           s2,s1,s1
+   33 00000022 EE61 1A20       VMUL.F           s3,s2,s1    ;Stores x^3
+   34 00000026 EEB1 2A08       VMOV.F           s4,#6       ; 3! = 6
+   35 0000002A EEC1 2A82       VDIV.F           s5,s3,s4    ;Stores x^3/3!
+   36 0000002E         
+   37 0000002E         ;Find third term
+   38 0000002E EE21 3AA0       VMUL.F           s6,s3,s1
+   39 00000032 EE63 3A20       VMUL.F           s7,s6,s1    ;Stores x^5
+   40 00000036 F04F 0378       MOV              r3,#120     ; 5! = 120
+   41 0000003A EE04 3A90       VMOV.F           s9,r3
+   42 0000003E EEF8 4AE4       VCVT.F32.S32     s9,s9
+   43 00000042 EE83 4AA4       VDIV.F           s8,s7,s9    ;Stores x^5/5!
+   44 00000046         
+   45 00000046 EE30 5AE2       VSUB.F           s10,s1,s5   ; Calculate value o
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            f first 2 terms
+   46 0000004A EE35 5A04       VADD.F           s10,s10,s8  ; Add first 2 terms
+                                                             to last term
+   47 0000004E         
+   48 0000004E         terminate                            ; sit in an endless
+                                                             loop
+   49 0000004E E7FE            B                terminate
+   50 00000050                 END
+              E000ED88 
+              40490FD0 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
+interwork --depend=.\objects\task1a.d -o.\objects\task1a.o -I.\RTE\_Target_1 -I
+C:\Users\kbria\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\Device\ARM\ARMCM4\Includ
+e -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVI
+SION_VERSION SETA 529" --predefine="ARMCM4_FP SETA 1" --list=.\listings\task1a.
+lst task1a.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 7 in file task1a.s
+   Uses
+      None
+Comment: RESET unused
+__Vectors 00000000
+
+Symbol: __Vectors
+   Definitions
+      At line 10 in file task1a.s
+   Uses
+      At line 8 in file task1a.s
+Comment: __Vectors used once
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Reset_Handler 00000000
+
+Symbol: Reset_Handler
+   Definitions
+      At line 16 in file task1a.s
+   Uses
+      At line 9 in file task1a.s
+      At line 12 in file task1a.s
+
+Task1a_Code 00000000
+
+Symbol: Task1a_Code
+   Definitions
+      At line 14 in file task1a.s
+   Uses
+      None
+Comment: Task1a_Code unused
+copro_setup 00000000
+
+Symbol: copro_setup
+   Definitions
+      At line 17 in file task1a.s
+   Uses
+      None
+Comment: copro_setup unused
+terminate 0000004E
+
+Symbol: terminate
+   Definitions
+      At line 48 in file task1a.s
+   Uses
+      At line 49 in file task1a.s
+Comment: terminate used once
+4 symbols
+342 symbols in table

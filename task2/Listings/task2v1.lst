@@ -1,0 +1,275 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; Task 2 - Data processing calculations on a Cortex - M3
+                       
+    2 00000000         ; This program implements a filter operating on a sample
+                       d data,
+    3 00000000         ; achieved by peforming a series of correlations
+    4 00000000         ; The samples are stored at read only memory location sa
+                       mpled, 
+    5 00000000         ; there must be a minimum of 8 samples and a maximum of 
+                       64 samples
+    6 00000000         ; Values of filter data are fixed and number of values a
+                       re also fixed.
+    7 00000000         
+    8 00000000         ; Set up the exception addresses
+    9 00000000                 THUMB
+   10 00000000                 AREA             RESET, CODE, READONLY
+   11 00000000                 EXPORT           __Vectors
+   12 00000000                 EXPORT           Reset_Handler
+   13 00000000         __Vectors
+   14 00000000 20001000        DCD              0x20001000  ; top of the stack 
+                                                            
+   15 00000004 00000000        DCD              Reset_Handler ; reset vector - 
+                                                            where the program s
+                                                            tarts
+   16 00000008         
+   17 00000008                 AREA             c02t02_Code, CODE, READONLY
+   18 00000000                 ENTRY
+   19 00000000         Reset_Handler
+   20 00000000 F04F 0009       MOV              r0,#(1+sampled_end-sampled)-8 ;
+                                                             number of calculat
+                                                            ions needed
+   21 00000004 F8DF 907C       LDR              r9,=sampled ; start of the ADC 
+                                                            sampled data area
+   22 00000008 F8DF B07C       LDR              r11,=filtered ; location to sto
+                                                            re results
+   23 0000000C         
+   24 0000000C         filter_loop
+   25 0000000C F859 4B04       LDR              r4,[r9],#4  ; get next 4 bytes 
+                                                            from the sampled da
+                                                            ta area
+   26 00000010 F3C4 0507       UBFX             r5, r4, #0, #8 ; filter out dat
+                                                            a value
+   27 00000014 EA4F 1345       LSL              r3,r5,#5    ; mutiply data valu
+                                                            e by filter value 3
+                                                            2
+   28 00000018         
+   29 00000018 F3C4 2507       UBFX             r5, r4, #8, #8 ; filter out dat
+                                                            a value
+   30 0000001C EA4F 1545       LSL              r5,r5,#5    ; mutiply data valu
+                                                            e by filter value 3
+                                                            2
+   31 00000020 442B            ADD              r3,r3,r5    ; accumulate result
+                                                            
+   32 00000022         
+   33 00000022 F3C4 4507       UBFX             r5, r4, #16, #8 ; filter out da
+                                                            ta value
+   34 00000026 EA4F 1585       LSL              r5,r5,#6    ; mutiply data valu
+                                                            e by filter value 6
+                                                            4
+   35 0000002A 442B            ADD              r3,r3,r5    ; accumulate result
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            
+   36 0000002C         
+   37 0000002C F3C4 6507       UBFX             r5, r4, #24, #8 ; filter out da
+                                                            ta value
+   38 00000030 EA4F 15C5       LSL              r5,r5,#7    ; mutiply data valu
+                                                            e by filter value 1
+                                                            28
+   39 00000034 442B            ADD              r3,r3,r5    ; accumulate result
+                                                            
+   40 00000036         
+   41 00000036 F859 4B04       LDR              r4,[r9],#4  ; get next 4 bytes 
+                                                            from the sampled da
+                                                            ta area
+   42 0000003A         
+   43 0000003A F3C4 0507       UBFX             r5, r4, #0, #8 ; filter out dat
+                                                            a value
+   44 0000003E EA4F 15C5       LSL              r5,r5,#7    ; mutiply data valu
+                                                            e by filter value 1
+                                                            28
+   45 00000042 442B            ADD              r3,r3,r5    ; accumulate result
+                                                            
+   46 00000044         
+   47 00000044 F3C4 2507       UBFX             r5, r4, #8, #8 ; filter out dat
+                                                            a value
+   48 00000048 EA4F 1585       LSL              r5,r5,#6    ; mutiply data valu
+                                                            e by filter value 6
+                                                            4
+   49 0000004C 442B            ADD              r3,r3,r5    ; accumulate result
+                                                            
+   50 0000004E         
+   51 0000004E F3C4 4507       UBFX             r5, r4, #16, #8 ; filter out da
+                                                            ta value
+   52 00000052 EA4F 1545       LSL              r5,r5,#5    ; mutiply data valu
+                                                            e by filter value 3
+                                                            2
+   53 00000056 442B            ADD              r3,r3,r5    ; accumulate result
+                                                            
+   54 00000058         
+   55 00000058 F3C4 6507       UBFX             r5, r4, #24, #8 ; filter out da
+                                                            ta value
+   56 0000005C EA4F 1545       LSL              r5,r5,#5    ; mutiply data valu
+                                                            e by filter value 3
+                                                            2
+   57 00000060 442B            ADD              r3,r3,r5    ; accumulate result
+                                                            
+   58 00000062         
+   59 00000062 EA4F 2353       LSR              r3,r3,#9    ; scale the filtere
+                                                            d value by 512
+   60 00000066 F84B 3B04       STR              r3,[r11],#4 ; store filtered va
+                                                            lue in read/write a
+                                                            rea
+   61 0000006A F1A9 0907       SUB              r9,r9,#7    ; change to next da
+                                                            ta value for filter
+                                                            ing
+   62 0000006E 1E40            SUBS             r0,r0,#1    ; decrement counter
+                                                             for num of calcula
+                                                            tions
+   63 00000070 D1CC            BNE              filter_loop ; next filtered val
+                                                            ue  
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   64 00000072         
+   65 00000072         terminate                            ; finish in an endl
+                                                            ess loop
+   66 00000072 E7FE            B                terminate
+   67 00000074         
+   68 00000074         ; provide the initial sampled and filter values 
+   69 00000074                 ALIGN            4
+   70 00000074         sampled                              ; 8-bit unsigned sa
+                                                            mpled values obtain
+                                                            ed from an ADC
+   71 00000074 66 18 7F 
+              80 EF 78 
+              59 17 00 
+              0F 7B FC 
+              2D C1 9C 
+              67               DCB              102,24,127,128,239,120,89,23,0,
+15,123,252,45,193,156,103
+   72 00000084         sampled_end
+   73 00000084         
+   74 00000084         ; region to hold the filtered data values
+   75 00000084 00000000 
+              00000000         AREA             c02t02_Data, DATA, READWRITE
+   76 00000000         filtered
+   77 00000000 00 00 00 
+              00 00 00 
+              00 00 00         FILL             (1+sampled_end-sampled)-8
+   78 00000009                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\objects\task2v1.d -o.\objects\task2v1.o -I.\RTE\_Target_1 -IC:\U
+sers\kbria\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\Device\ARM\ARMCM3\Include -I
+C:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISION
+_VERSION SETA 529" --predefine="ARMCM3 SETA 1" --list=.\listings\task2v1.lst ta
+sk2v1.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 10 in file task2v1.s
+   Uses
+      None
+Comment: RESET unused
+__Vectors 00000000
+
+Symbol: __Vectors
+   Definitions
+      At line 13 in file task2v1.s
+   Uses
+      At line 11 in file task2v1.s
+Comment: __Vectors used once
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Reset_Handler 00000000
+
+Symbol: Reset_Handler
+   Definitions
+      At line 19 in file task2v1.s
+   Uses
+      At line 12 in file task2v1.s
+      At line 15 in file task2v1.s
+
+c02t02_Code 00000000
+
+Symbol: c02t02_Code
+   Definitions
+      At line 17 in file task2v1.s
+   Uses
+      None
+Comment: c02t02_Code unused
+filter_loop 0000000C
+
+Symbol: filter_loop
+   Definitions
+      At line 24 in file task2v1.s
+   Uses
+      At line 63 in file task2v1.s
+Comment: filter_loop used once
+sampled 00000074
+
+Symbol: sampled
+   Definitions
+      At line 70 in file task2v1.s
+   Uses
+      At line 20 in file task2v1.s
+      At line 21 in file task2v1.s
+      At line 77 in file task2v1.s
+
+sampled_end 00000084
+
+Symbol: sampled_end
+   Definitions
+      At line 72 in file task2v1.s
+   Uses
+      At line 20 in file task2v1.s
+      At line 77 in file task2v1.s
+
+terminate 00000072
+
+Symbol: terminate
+   Definitions
+      At line 65 in file task2v1.s
+   Uses
+      At line 66 in file task2v1.s
+Comment: terminate used once
+6 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+c02t02_Data 00000000
+
+Symbol: c02t02_Data
+   Definitions
+      At line 75 in file task2v1.s
+   Uses
+      None
+Comment: c02t02_Data unused
+filtered 00000000
+
+Symbol: filtered
+   Definitions
+      At line 76 in file task2v1.s
+   Uses
+      At line 22 in file task2v1.s
+Comment: filtered used once
+2 symbols
+345 symbols in table
